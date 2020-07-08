@@ -8,6 +8,9 @@
 
 #include <a_samp>
 
+#define SAMP_LOGGER_COMPAT
+
+#tryinclude <logger>
 #tryinclude <progress2>
 #tryinclude <YSI_Coding\y_hooks>
 
@@ -20,6 +23,8 @@
 /// Variables
 /// </summary>
 static
+	__pcPlayersConnected = 0,
+
 	PlayerText: PC_TextDrawCount[MAX_PLAYERS],
 	PlayerBar: PC_ProgressBar[MAX_PLAYERS] = {INVALID_PLAYER_BAR_ID,...};
 
@@ -38,7 +43,20 @@ static
 /// </summary>
 hook OnPlayerConnect(playerid)
 {
-	PC_CreatePlayerHud(playerid);
+	++__pcPlayersConnected;
+
+	PC_CreatePlayerHud(playerid, true);
+
+	return 1;
+}
+
+
+hook OnPlayerDisconnect(playerid, reason)
+{
+	--__pcPlayersConnected;
+
+	PC_CreatePlayerHud(playerid, false);
+
 	return 1;
 }
 
@@ -46,12 +64,16 @@ hook OnPlayerConnect(playerid)
 /// <summary>
 /// Functions
 /// </summary>
-static stock PC_CreatePlayerHud(const playerid, bool: __status = true)
+stock PC_CreatePlayerHud(const playerid, bool: __status)
 {
 	if (!__status)
 	{
 		PlayerTextDrawDestroy(playerid, PC_TextDrawCount[playerid]);
 		DestroyPlayerProgressBar(playerid, PC_ProgressBar[playerid]);
+
+		PC_UpdateBarTD(playerid);
+
+		__pcStatus[playerid] = false;
 
 		return 1;
 	}
@@ -79,6 +101,10 @@ static stock PC_CreatePlayerHud(const playerid, bool: __status = true)
 	ShowPlayerProgressBar(playerid, PC_ProgressBar[playerid]);
 	SetPlayerProgressBarValue(playerid, PC_ProgressBar[playerid], __PC_DEFAULT_BAR_VALUE);
 
+	PC_UpdateBarTD(playerid);
+
+	__pcStatus[playerid] = true;
+
 	return 1;
 }
 
@@ -86,11 +112,12 @@ static stock PC_CreatePlayerHud(const playerid, bool: __status = true)
 /// <summary>
 /// Change player bar color
 /// </summary>
-static stock PC_SetPlayerBarColor(const playerid, const color = __PC_DEFAULT_BAR_COLOR)
+stock PC_SetPlayerBarColor(const playerid, const color = __PC_DEFAULT_BAR_COLOR)
 {
 	__pcBarColor[playerid] = color;
 
 	SetPlayerProgressBarColour(playerid, PC_ProgressBar[playerid], __pcBarColor[playerid]);
+	ShowPlayerProgressBar(playerid, PC_ProgressBar[playerid]);
 
 	return 1;
 }
@@ -99,7 +126,7 @@ static stock PC_SetPlayerBarColor(const playerid, const color = __PC_DEFAULT_BAR
 /// <summary>
 /// Getting status of player hud
 /// </summary>
-static stock bool: PC_GetPlayerHudStatus(const playerid)
+stock bool: PC_GetPlayerHudStatus(const playerid)
 {
 	return __pcStatus[playerid];
 }
@@ -108,7 +135,28 @@ static stock bool: PC_GetPlayerHudStatus(const playerid)
 /// <summary>
 /// Getting player bar color
 /// </summary>
-static stock PC_GetPlayerBarColor(const playerid)
+stock PC_GetPlayerBarColor(const playerid)
 {
 	return __pcBarColor[playerid];
+}
+
+
+/// <summary>
+/// Updating player bar & player textdraw status
+/// </summary>
+stock PC_UpdateBarTD(const playerid)
+{
+	static
+		__string[30];
+
+
+	format(
+		__string, sizeof __string, "~y~PLAYERS:_~w~%d/~r~%d",
+		__pcPlayersConnected, MAX_PLAYERS
+	);
+
+	PlayerTextDrawSetString(playerid, PC_TextDrawCount[playerid], __string);
+	SetPlayerProgressBarValue(playerid, PC_ProgressBar[playerid], (__pcPlayersConnected + 5.0));
+
+	return 1;
 }
