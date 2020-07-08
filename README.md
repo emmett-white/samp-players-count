@@ -38,14 +38,46 @@ Include in your code and begin using the library:
 #include <players-count>
 ```
 
-## Usage
+## Functions
 
-<!--
-Write your code documentation or examples here. If your library is documented in
-the source code, direct users there. If not, list your API and describe it well
-in this section. If your library is passive and has no API, simply omit this
-section.
--->
+```pawn
+stock PC_CreatePlayerHud(const playerid, bool: __status)
+
+// Usage
+// Example
+YCMD:hud(playerid, const params[], help)
+{
+  PC_CreatePlayerHud(playerid, (PC_GetPlayerHudStatus(playerid) ? (false) : (true)));
+  return COMMAND_OK;
+}
+```
+
+```pawn
+stock PC_SetPlayerBarColor(const playerid, const color = __PC_DEFAULT_BAR_COLOR)
+
+// Usage
+// Example
+YCMD:barcolor(playerid, const params[], help)
+{
+    static
+        __color;
+
+
+    if (sscanf(params, "x", __color))
+        return SendClientMessage(playerid, -1, "/barcolor [hex color]");
+
+
+    PC_SetPlayerBarColor(playerid, __color);
+
+    return COMMAND_OK;
+}
+```
+
+```pawn
+stock bool: PC_GetPlayerHudStatus(const playerid)
+stock PC_GetPlayerBarColor(const playerid)
+stock PC_UpdateBarTD(const playerid)
+```
 
 ## Testing
 
