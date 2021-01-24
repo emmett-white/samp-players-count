@@ -23,9 +23,9 @@ static
 
 // * API *
 static
-	bool: gPC_Status[MAX_PLAYERS],
+	bool: PC_Status[MAX_PLAYERS],
 
-	gPC_BarColour[MAX_PLAYERS];
+	PC_BarColour[MAX_PLAYERS];
 
 // * Hooks *
 public OnPlayerConnect(playerid)
@@ -63,7 +63,7 @@ stock PC_CreatePlayerHud(const playerid, bool: status = true)
 
 		PC_UpdateBarTD(playerid);
 
-		gPC_Status[playerid] = false;
+		PC_Status[playerid] = false;
 
 		return 1;
 	}
@@ -87,16 +87,16 @@ stock PC_CreatePlayerHud(const playerid, bool: status = true)
 
 	PC_UpdateBarTD(playerid);
 
-	gPC_Status[playerid] = true;
+	PC_Status[playerid] = true;
 
 	return 1;
 }
 
 stock PC_SetPlayerBarColour(const playerid, const colour = PC_DEFAULT_BAR_COLOUR)
 {
-	gPC_BarColour[playerid] = colour;
+	PC_BarColour[playerid] = colour;
 
-	SetPlayerProgressBarColour(playerid, PC_ProgressBar[playerid], gPC_BarColour[playerid]);
+	SetPlayerProgressBarColour(playerid, PC_ProgressBar[playerid], PC_BarColour[playerid]);
 	ShowPlayerProgressBar(playerid, PC_ProgressBar[playerid]);
 
 	return 1;
@@ -104,12 +104,12 @@ stock PC_SetPlayerBarColour(const playerid, const colour = PC_DEFAULT_BAR_COLOUR
 
 stock bool: PC_GetPlayerHudStatus(const playerid)
 {
-	return gPC_Status[playerid];
+	return PC_Status[playerid];
 }
 
 stock PC_GetPlayerBarColor(const playerid)
 {
-	return gPC_BarColour[playerid];
+	return PC_BarColour[playerid];
 }
 
 stock PC_UpdateBarTD(const playerid)
